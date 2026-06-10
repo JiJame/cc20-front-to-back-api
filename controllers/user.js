@@ -26,7 +26,17 @@ export const updateRoleUser = async (req, res, next) => {
     const { role } = req.body;
     // console.log(id, role);
 
-    res.json({ message: "This is Update Role User" });
+    // 2. Update to DB
+    const user = await prisma.user.update({
+      where: {
+        id: Number(id),
+      },
+      data: {
+        role: role,
+      },
+    });
+
+    res.json({ message: `Updated Role ${user.name}` });
   } catch (error) {
     next(error);
   }
@@ -34,7 +44,33 @@ export const updateRoleUser = async (req, res, next) => {
 
 export const deleteUser = async (req, res, next) => {
   try {
-    res.json({ message: "This is Delete User" });
+    const { id } = req.params;
+    const user = await prisma.user.delete({
+      where: {
+        id: Number(id),
+      },
+    });
+
+    res.json({ message: "Delete Success !!!" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getMe = async (req, res, next) => {
+  try {
+    const { id } = req.user; // ผ่านมาจาก AuthCheck
+    console.log(id);
+    const user = await prisma.user.findFirst({
+      where: {
+        id: Number(id),
+      },
+      omit: {
+        password: true,
+      },
+    });
+
+    res.json({ result: user });
   } catch (error) {
     next(error);
   }
